@@ -1,0 +1,171 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Light theme - minimal, clean aesthetic */
+  --background: oklch(0.99 0.002 264);
+  --foreground: oklch(0.09 0.005 264);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.09 0.005 264);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.09 0.005 264);
+  --primary: oklch(0.09 0.005 264);
+  --primary-foreground: oklch(0.99 0.002 264);
+  --secondary: oklch(0.96 0.002 264);
+  --secondary-foreground: oklch(0.09 0.005 264);
+  --muted: oklch(0.96 0.002 264);
+  --muted-foreground: oklch(0.45 0.002 264);
+  --accent: oklch(0.96 0.002 264);
+  --accent-foreground: oklch(0.09 0.005 264);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0.002 264);
+  --border: oklch(0.92 0.002 264);
+  --input: oklch(0.92 0.002 264);
+  --ring: oklch(0.09 0.005 264);
+
+  /* Accent colors for synqr branding */
+  --accent-blue: oklch(0.5 0.2 240);
+  --accent-purple: oklch(0.45 0.2 280);
+  --accent-green: oklch(0.55 0.15 150);
+
+  --radius: 0.5rem;
+  --sidebar: oklch(0.98 0.002 264);
+  --sidebar-foreground: oklch(0.09 0.005 264);
+  --sidebar-primary: oklch(0.09 0.005 264);
+  --sidebar-primary-foreground: oklch(0.99 0.002 264);
+  --sidebar-accent: oklch(0.96 0.002 264);
+  --sidebar-accent-foreground: oklch(0.09 0.005 264);
+  --sidebar-border: oklch(0.92 0.002 264);
+  --sidebar-ring: oklch(0.09 0.005 264);
+}
+
+.dark {
+  /* Dark theme inspired by modern tech platforms - deep blacks with subtle grays */
+  --background: oklch(0.02 0.002 264); /* Very dark background */
+  --foreground: oklch(0.98 0.002 264); /* Bright white text */
+  --card: oklch(0.04 0.002 264); /* Slightly lighter cards */
+  --card-foreground: oklch(0.98 0.002 264);
+  --popover: oklch(0.04 0.002 264);
+  --popover-foreground: oklch(0.98 0.002 264);
+  --primary: oklch(0.98 0.002 264); /* White primary for dark theme */
+  --primary-foreground: oklch(0.02 0.002 264); /* Dark text on white buttons */
+  --secondary: oklch(0.08 0.002 264); /* Dark secondary */
+  --secondary-foreground: oklch(0.98 0.002 264);
+  --muted: oklch(0.08 0.002 264);
+  --muted-foreground: oklch(0.65 0.002 264); /* Medium gray for muted text */
+  --accent: oklch(0.08 0.002 264);
+  --accent-foreground: oklch(0.98 0.002 264);
+  --destructive: oklch(0.65 0.3 27.325);
+  --destructive-foreground: oklch(0.98 0.002 264);
+  --border: oklch(0.12 0.002 264); /* Subtle borders */
+  --input: oklch(0.12 0.002 264);
+  --ring: oklch(0.98 0.002 264);
+
+  /* Enhanced accent colors for dark theme */
+  --accent-blue: oklch(0.6 0.25 240);
+  --accent-purple: oklch(0.55 0.25 280);
+  --accent-green: oklch(0.65 0.2 150);
+
+  --sidebar: oklch(0.06 0.002 264);
+  --sidebar-foreground: oklch(0.98 0.002 264);
+  --sidebar-primary: oklch(0.98 0.002 264);
+  --sidebar-primary-foreground: oklch(0.02 0.002 264);
+  --sidebar-accent: oklch(0.08 0.002 264);
+  --sidebar-accent-foreground: oklch(0.98 0.002 264);
+  --sidebar-border: oklch(0.12 0.002 264);
+  --sidebar-ring: oklch(0.98 0.002 264);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Added custom accent color tokens */
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-purple: var(--accent-purple);
+  --color-accent-green: var(--accent-green);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Added subtle grid pattern for modern tech aesthetic */
+.grid-pattern {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Smooth hover animations for interactive elements */
+.hover-lift {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Subtle fade-in animation for content */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out;
+}
+
+/* Gradient text effect for branding */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
