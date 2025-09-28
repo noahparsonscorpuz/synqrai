@@ -101,14 +101,27 @@ export function MeetingCreator({ user }: MeetingCreatorProps) {
 
   const createMeeting = async () => {
     setIsCreating(true)
-
-    // Simulate meeting creation
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    // Generate invite link
-    const meetingId = meetingData.title.toLowerCase().replace(/\s+/g, "-")
-    setInviteLink(`${window.location.origin}/invite/${meetingId}`)
-    setIsCreating(false)
+    try {
+      const res = await fetch("/api/meetings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: meetingData.title,
+          description: meetingData.description,
+          duration: meetingData.duration,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || `Failed to create meeting (${res.status})`)
+      }
+      const { meeting } = await res.json()
+      setInviteLink(`${window.location.origin}/invite/${meeting.id}`)
+    } catch (e) {
+      console.error("Create meeting failed", e)
+    } finally {
+      setIsCreating(false)
+    }
   }
 
   const copyInviteLink = () => {
