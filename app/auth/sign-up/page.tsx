@@ -27,18 +27,21 @@ export default function SignUpPage() {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signUp({
+      // Create the user without email confirmation flow for demo
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard`,
-          data: {
-            full_name: fullName,
-          },
+          data: { full_name: fullName },
         },
       })
-      if (error) throw error
-      router.push("/auth/sign-up-success")
+      if (signUpError) throw signUpError
+
+      // Immediately sign in so the demo skips email verification
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      if (signInError) throw signInError
+
+      router.push("/dashboard")
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred")
     } finally {

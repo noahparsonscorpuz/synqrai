@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -14,54 +14,29 @@ import { RealTimeTracker } from "@/components/real-time-tracker"
 interface MeetingInvite {
   id: string
   title: string
-  description: string
-  organizer: string
-  type: string
+  description?: string
+  organizer?: string
+  type?: string
   duration: number
-  participants: number
-  deadline: string
-  constraints: string[]
+  participants?: number
+  deadline?: string
+  constraints?: string[]
 }
 
-// Mock meeting data based on invite ID
-const getMeetingData = (id: string): MeetingInvite => {
-  const meetings: { [key: string]: MeetingInvite } = {
-    "team-standup": {
-      id: "team-standup",
-      title: "Weekly Team Standup",
-      description: "Our regular team sync to discuss progress, blockers, and upcoming priorities",
-      organizer: "Sarah Chen",
-      type: "Team Meeting",
-      duration: 60,
-      participants: 8,
-      deadline: "2024-01-15",
-      constraints: ["Business hours only", "No Fridays after 3 PM", "Minimum 2-hour notice"],
-    },
-    "study-group": {
-      id: "study-group",
-      title: "CS 229 Study Session",
-      description: "Machine Learning final exam prep - covering supervised learning and neural networks",
-      organizer: "Marcus Johnson",
-      type: "Study Group",
-      duration: 120,
-      participants: 6,
-      deadline: "2024-01-12",
-      constraints: ["Evenings preferred", "Library availability", "Weekend sessions OK"],
-    },
-    "photo-walk": {
-      id: "photo-walk",
-      title: "Golden Hour Photography Walk",
-      description: "Exploring downtown architecture during golden hour - bring your camera!",
-      organizer: "Emily Rodriguez",
-      type: "Club Event",
-      duration: 180,
-      participants: 12,
-      deadline: "2024-01-10",
-      constraints: ["Weather dependent", "Sunset timing", "Public transport accessible"],
-    },
+const fetchMeetingData = async (id: string): Promise<MeetingInvite | null> => {
+  try {
+    const res = await fetch(`/api/meetings/${id}`)
+    if (!res.ok) return null
+    const { meeting } = await res.json()
+    return {
+      id: meeting.id,
+      title: meeting.title,
+      description: meeting.description ?? undefined,
+      duration: meeting.duration,
+    }
+  } catch {
+    return null
   }
-
-  return meetings[id] || meetings["team-standup"]
 }
 
 export default function InvitePage() {
@@ -76,25 +51,27 @@ export default function InvitePage() {
   const [showRealTimeTracker, setShowRealTimeTracker] = useState(false)
 
   useEffect(() => {
-    if (params.id) {
-      const meetingData = getMeetingData(params.id as string)
-      setMeeting(meetingData)
-      setParticipantCount(Math.floor(Math.random() * meetingData.participants) + 1)
+    const load = async () => {
+      if (params.id) {
+        const meetingData = await fetchMeetingData(params.id as string)
+        if (meetingData) {
+          setMeeting(meetingData)
+        }
 
-      // Initialize availability data
-      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-      const hours = Array.from({ length: 24 }, (_, i) => i)
-      const data: { [key: string]: { [key: number]: boolean } } = {}
-
-      days.forEach((day) => {
-        data[day] = {}
-        hours.forEach((hour) => {
-          data[day][hour] = false
+        // Initialize empty availability grid
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        const hours = Array.from({ length: 24 }, (_, i) => i)
+        const data: { [key: string]: { [key: number]: boolean } } = {}
+        days.forEach((day) => {
+          data[day] = {}
+          hours.forEach((hour) => {
+            data[day][hour] = false
+          })
         })
-      })
-
-      setAvailabilityData(data)
+        setAvailabilityData(data)
+      }
     }
+    load()
   }, [params.id])
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -127,12 +104,43 @@ export default function InvitePage() {
   }
 
   const handleSubmit = async () => {
-    if (!userName || !userEmail) return
+    if (!userName || !userEmail || !meeting) return
 
-    // Simulate submission
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    // Convert selected cells to slot keys: ISO strings of next week day/hour
+    const slots: string[] = []
+    const dayToIndex: Record<string, number> = { Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6, Sunday: 0 }
+
+    selectedCells.forEach((cell) => {
+      const [day, hourStr] = cell.split("-")
+      const target = new Date()
+      const desiredDow = dayToIndex[day]
+      const delta = (7 + desiredDow - target.getDay()) % 7
+      target.setDate(target.getDate() + delta)
+      target.setHours(Number(hourStr), 0, 0, 0)
+      slots.push(target.toISOString())
+    })
+
+    // Post to availability API (requires auth user). Guests would normally use magic link or token; for demo, fallback.
+    try {
+      const res = await fetch("/api/availability", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          meeting_id: meeting.id,
+          available_slots: slots,
+          constraints: { submitted_by: userEmail, name: userName },
+        }),
+      })
+      if (!res.ok) {
+        // Non-auth fallback: just proceed UI-wise
+        console.warn("Availability submission failed", await res.text())
+      }
+    } catch (e) {
+      console.warn("Availability submission error", e)
+    }
+
     setIsSubmitted(true)
-    setShowRealTimeTracker(true) // Show real-time tracker after submission
+    setShowRealTimeTracker(true)
   }
 
   const getSelectedHours = () => {
@@ -205,7 +213,7 @@ export default function InvitePage() {
           <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--thermal-1)] to-[var(--thermal-4)] mb-4">
             {meeting.title}
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">{meeting.description}</p>
+          {meeting.description && <p className="text-muted-foreground max-w-2xl mx-auto">{meeting.description}</p>}
         </div>
 
         {/* Meeting Info */}
@@ -230,11 +238,15 @@ export default function InvitePage() {
                   <div className="text-xs text-muted-foreground">Responses</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-[var(--thermal-4)] mb-1">{meeting.organizer}</div>
+                  {meeting.organizer && (
+                    <div className="text-2xl font-bold text-[var(--thermal-4)] mb-1">{meeting.organizer}</div>
+                  )}
                   <div className="text-xs text-muted-foreground">Organizer</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-[var(--thermal-1)] mb-1">{meeting.deadline}</div>
+                  {meeting.deadline && (
+                    <div className="text-2xl font-bold text-[var(--thermal-1)] mb-1">{meeting.deadline}</div>
+                  )}
                   <div className="text-xs text-muted-foreground">Deadline</div>
                 </div>
               </div>
@@ -242,7 +254,7 @@ export default function InvitePage() {
               <div className="mt-4">
                 <h4 className="text-sm font-medium mb-2">Scheduling Constraints:</h4>
                 <div className="flex flex-wrap gap-2">
-                  {meeting.constraints.map((constraint, index) => (
+                  {(meeting.constraints || []).map((constraint, index) => (
                     <Badge key={index} variant="secondary" className="text-xs">
                       {constraint}
                     </Badge>

@@ -1,22 +1,11 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-})
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-})
-
 export const metadata: Metadata = {
-  title: "synqr.ai - Smart Medical Scheduling",
+  title: "synqr.ai",
   description: "AI-powered scheduling platform for medical professionals with thermal heatmap interface",
   generator: "v0.app",
 }
@@ -28,7 +17,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`font-sans ${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body
+        className="font-sans antialiased"
+        style={{ fontFamily: '"Geist", "Geist Mono", sans-serif' }}
+      >
         <Suspense fallback={null}>
           {children}
           <Analytics />

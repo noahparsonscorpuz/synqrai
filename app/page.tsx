@@ -14,7 +14,10 @@ import {
   GraduationCap,
   Coffee,
   Play,
+  Link,
 } from "lucide-react"
+
+import NextLink from "next/link"
 
 export default function HomePage() {
   return (
@@ -36,10 +39,17 @@ export default function HomePage() {
             availability collection to confirmed events automatically.
           </p>
           <div className="flex items-center justify-center gap-4 mb-16 flex-wrap">
+          <NextLink href="/auth/login" passHref>
             <Button size="lg" className="px-8 py-3 text-lg">
               Get Started
-            </Button>
-            <Button variant="outline" size="lg" className="px-8 py-3 text-lg bg-transparent">
+              </Button>
+          </NextLink>
+            <Button variant="outline" size="lg" className="px-8 py-3 text-lg bg-transparent" onClick={() => {
+              const demoSection = document.getElementById("demo-section")
+              if (demoSection) {
+                demoSection.scrollIntoView({ behavior: "smooth" })
+              }
+            }}>
               Watch Demo
             </Button>
           </div>
@@ -91,7 +101,7 @@ export default function HomePage() {
           </Card>
         </div>
 
-        <div className="bg-card border border-border/50 rounded-2xl p-12 max-w-7xl mx-auto mb-20">
+        <div id="demo-section" className="bg-card border border-border/50 rounded-2xl p-12 max-w-7xl mx-auto mb-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-foreground mb-4">See synqr in action</h2>
             <p className="text-muted-foreground">
@@ -140,7 +150,12 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <Button className="w-full" size="lg">
+              <Button className="w-full" size="lg" onClick={() => {
+                const demoSection = document.getElementById("demo-section")
+                if (demoSection) {
+                  demoSection.scrollIntoView({ behavior: "smooth" })
+                }
+              }}>
                 <Play className="mr-2 h-4 w-4" />
                 Watch 2-Minute Demo
               </Button>
@@ -497,13 +512,17 @@ export default function HomePage() {
             Join thousands of teams who've eliminated scheduling coordination forever.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
+            <NextLink href="/auth/login" passHref>
             <Button size="lg" className="px-8 py-3 text-lg">
               Start Free Trial
             </Button>
+            </NextLink>
+            <NextLink href="/auth/login" passHref>
             <Button variant="outline" size="lg" className="px-8 py-3 text-lg bg-transparent">
               Schedule Demo
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
+            </NextLink>
           </div>
         </div>
       </div>
