@@ -34,7 +34,22 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json()
-  const { title, description, duration } = body
+  const { title, description, duration, start_date, end_date, constraints } = body
+  if (!title) {
+    return NextResponse.json({ error: "Title is required" }, { status: 400 })
+  }
+  if (start_date && end_date) {
+    const start = new Date(start_date)
+    const end = new Date(end_date)
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return NextResponse.json({ error: "Invalid date range" }, { status: 400 })
+    }
+    // Limit to 31-day window
+    const maxMs = 31 * 24 * 60 * 60 * 1000
+    if (end.getTime() - start.getTime() > maxMs) {
+      return NextResponse.json({ error: "Date range cannot exceed 31 days" }, { status: 400 })
+    }
+  }
 
   const { data: meeting, error } = await supabase
     .from("meetings")
@@ -42,6 +57,9 @@ export async function POST(request: NextRequest) {
       title,
       description,
       duration,
+      start_date: start_date ?? null,
+      end_date: end_date ?? null,
+      constraints: constraints ?? {},
       created_by: user.id,
     })
     .select()

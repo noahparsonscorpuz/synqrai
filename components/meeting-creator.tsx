@@ -41,9 +41,13 @@ export function MeetingCreator({ user }: MeetingCreatorProps) {
     duration: 60,
     maxParticipants: 10,
     deadline: "",
+    startDate: "",
+    endDate: "",
     location: "",
     isRecurring: false,
     recurringPattern: "weekly",
+    timeStart: "08:00",
+    timeEnd: "18:00",
   })
   const [constraints, setConstraints] = useState<Constraint[]>([])
   const [participants, setParticipants] = useState<string[]>([])
@@ -109,6 +113,16 @@ export function MeetingCreator({ user }: MeetingCreatorProps) {
           title: meetingData.title,
           description: meetingData.description,
           duration: meetingData.duration,
+          start_date: meetingData.startDate || null,
+          end_date: meetingData.endDate || null,
+          constraints: (() => {
+            const base = constraints.reduce((acc, c) => {
+              acc[c.id] = { type: c.type, description: c.description, value: c.value }
+              return acc
+            }, {} as Record<string, any>)
+            base.time_window = { start: meetingData.timeStart, end: meetingData.timeEnd }
+            return base
+          })(),
         }),
       })
       if (!res.ok) {
@@ -296,6 +310,24 @@ export function MeetingCreator({ user }: MeetingCreatorProps) {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="startDate">Start Date (max 31 days)</Label>
+                  <Input
+                    id="startDate"
+                    type="date"
+                    value={meetingData.startDate}
+                    onChange={(e) => setMeetingData({ ...meetingData, startDate: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endDate">End Date</Label>
+                  <Input
+                    id="endDate"
+                    type="date"
+                    value={meetingData.endDate}
+                    onChange={(e) => setMeetingData({ ...meetingData, endDate: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="deadline">Response Deadline</Label>
                   <Input
                     id="deadline"
@@ -303,6 +335,36 @@ export function MeetingCreator({ user }: MeetingCreatorProps) {
                     value={meetingData.deadline}
                     onChange={(e) => setMeetingData({ ...meetingData, deadline: e.target.value })}
                   />
+                </div>
+              </div>
+
+              {/* Daily Time Window */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Daily Earliest Time</Label>
+                  <Select value={meetingData.timeStart} onValueChange={(value) => setMeetingData({ ...meetingData, timeStart: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Start" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 24 }, (_, h) => `${String(h).padStart(2, '0')}:00`).map((t) => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Daily Latest Time</Label>
+                  <Select value={meetingData.timeEnd} onValueChange={(value) => setMeetingData({ ...meetingData, timeEnd: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="End" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 24 }, (_, h) => `${String(h).padStart(2, '0')}:00`).map((t) => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -520,6 +582,14 @@ export function MeetingCreator({ user }: MeetingCreatorProps) {
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Constraints:</span>
                       <span className="font-medium">{constraints.length} rules</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Date Range:</span>
+                      <span className="font-medium">
+                        {meetingData.startDate && meetingData.endDate
+                          ? `${meetingData.startDate} → ${meetingData.endDate}`
+                          : "Not set"}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Participants:</span>

@@ -12,15 +12,17 @@ export interface Meeting {
   created_by: string
   status: "collecting" | "scheduled" | "cancelled"
   scheduled_time?: string
+  start_date?: string
+  end_date?: string
+  constraints?: any
   created_at: string
   updated_at: string
 }
 
-export interface Availability {
+export interface AvailabilityRow {
   id: string
-  meeting_id: string
-  user_id: string
-  available_slots: any[]
+  participant_id: string
+  slots: string[]
   constraints: any
   created_at: string
   updated_at: string
@@ -99,7 +101,8 @@ export function useRealtimeMeetings(userId?: string) {
 }
 
 export function useRealtimeAvailability(meetingId?: string) {
-  const [availability, setAvailability] = useState<Availability[]>([])
+  const [availability, setAvailability] = useState<AvailabilityRow[]>([])
+  const [participantIds, setParticipantIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
@@ -109,35 +112,54 @@ export function useRealtimeAvailability(meetingId?: string) {
     let channel: RealtimeChannel
 
     const fetchAvailability = async () => {
-      const { data, error } = await supabase.from("availability").select("*").eq("meeting_id", meetingId)
+      // Fetch participants for this meeting first
+      const { data: participants, error: pErr } = await supabase
+        .from("participants")
+        .select("id")
+        .eq("event_id", meetingId)
+      if (pErr) {
+        console.error("Error fetching participants:", pErr)
+      } else {
+        setParticipantIds(new Set((participants || []).map((p: any) => p.id)))
+      }
+
+      const { data, error } = await supabase
+        .from("availabilities")
+        .select("*")
+        .in(
+          "participant_id",
+          (participants || []).map((p: any) => p.id),
+        )
 
       if (error) {
         console.error("Error fetching availability:", error)
       } else {
-        setAvailability(data || [])
+        setAvailability((data as any) || [])
       }
       setLoading(false)
     }
 
     const setupRealtimeSubscription = () => {
       channel = supabase
-        .channel(`availability-${meetingId}`)
+        .channel(`availabilities-${meetingId}`)
         .on(
           "postgres_changes",
           {
             event: "*",
             schema: "public",
-            table: "availability",
-            filter: `meeting_id=eq.${meetingId}`,
+            table: "availabilities",
           },
           (payload) => {
             console.log("[v0] Real-time availability update:", payload)
 
+            const pid = (payload.new || payload.old)?.participant_id as string | undefined
+            if (!pid || !participantIds.has(pid)) return
+
             if (payload.eventType === "INSERT") {
-              setAvailability((prev) => [...prev, payload.new as Availability])
+              setAvailability((prev) => [...prev, payload.new as AvailabilityRow])
             } else if (payload.eventType === "UPDATE") {
               setAvailability((prev) =>
-                prev.map((avail) => (avail.id === payload.new.id ? (payload.new as Availability) : avail)),
+                prev.map((avail) => (avail.id === payload.new.id ? (payload.new as AvailabilityRow) : avail)),
               )
             } else if (payload.eventType === "DELETE") {
               setAvailability((prev) => prev.filter((avail) => avail.id !== payload.old.id))
