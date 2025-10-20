@@ -67,4 +67,4 @@ pnpm dev
 
 ### Notes
 - RLS policies protect data; ensure you are signed in to use APIs.
-- Realtime updates wired via `hooks/use-realtime.ts` and `components/realtime-dashboard.tsx`.
+- Realtime updates wired via. `hooks/use-realtime.ts` and `components/realtime-dashboard.tsx`.
