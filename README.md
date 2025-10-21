@@ -37,7 +37,8 @@ Create `.env.local` with:
 ```
 NEXT_PUBLIC_SUPABASE_URL=your-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-# optional fallbacks
+
+# optional fallbacks (outdated)
 SUPABASE_URL=your-url
 SUPABASE_ANON_KEY=your-anon-key
 NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=http://localhost:3000/dashboard
