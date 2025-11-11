@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
 
 export const metadata: Metadata = {
   title: "synqr.ai",
@@ -16,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -25,14 +26,13 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body
-        className="font-sans antialiased"
-        style={{ fontFamily: '"Geist", "Geist Mono", sans-serif' }}
-      >
-        <Suspense fallback={null}>
-          {children}
-          <Analytics />
-        </Suspense>
+      <body className="font-sans antialiased" style={{ fontFamily: '"Geist", "Geist Mono", sans-serif' }}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <Suspense fallback={null}>
+            {children}
+            <Analytics />
+          </Suspense>
+        </ThemeProvider>
       </body>
     </html>
   )
