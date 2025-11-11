@@ -1,6 +1,4 @@
-# synqr.ai
-
-🚀 **AI-powered scheduling with real-time availability and rules-based smart matching.**
+<img width="1280" height="584" alt="Screenshot 2025-11-10 at 7 41 02 PM" src="https://github.com/user-attachments/assets/bfac6d24-b191-4431-92eb-3bef156a1671" />
 
 ## ⚡ Tech Stack
 <p align="center">
