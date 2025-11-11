@@ -25,6 +25,8 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono&display=swap"
           rel="stylesheet"
         />
+        <link rel="icon" href="/synqr-icon-512-transparent.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/synqr-icon-512-transparent.png" />
       </head>
       <body className="font-sans antialiased" style={{ fontFamily: '"Geist", "Geist Mono", sans-serif' }}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
