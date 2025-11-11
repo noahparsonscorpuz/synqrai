@@ -14,21 +14,46 @@ import {
   GraduationCap,
   Coffee,
   Play,
-  Link,
+  Sun,
+  Moon,
 } from "lucide-react"
 
 import NextLink from "next/link"
+import { useTheme } from "next-themes"
+import Image from "next/image"
+import { useEffect, useState } from "react"
 
 export default function HomePage() {
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const isDark = mounted ? resolvedTheme === "dark" : undefined
   return (
     <div className="min-h-screen bg-background grid-pattern">
+      <div className="fixed top-4 right-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          aria-label="Toggle theme"
+          className="bg-background/60 backdrop-blur border-border"
+          onClick={() => setTheme(isDark ? "light" : "dark")}
+        >
+          {mounted ? (isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />) : <div className="h-4 w-4" />}
+        </Button>
+      </div>
       <div className="container mx-auto px-4 py-24">
         <div className="text-center mb-20 animate-fade-in-up">
           <div className="flex items-center justify-center mb-8">
-            <div className="relative">
-              <div className="h-20 w-20 rounded-2xl bg-primary flex items-center justify-center">
-                <Calendar className="h-10 w-10 text-primary-foreground" />
-              </div>
+            <div className="flex items-center gap-4">
+              <Image
+                src="/synqr-icon-512-transparent.png"
+                alt="synqr icon"
+                width={96}
+                height={96}
+                className="mx-auto"
+                priority
+              />
+              <span className="text-5xl font-bold text-foreground">synqr</span>
             </div>
           </div>
           <h1 className="text-7xl font-bold text-foreground mb-6 text-balance">
