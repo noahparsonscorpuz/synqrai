@@ -14,33 +14,14 @@ import {
   GraduationCap,
   Coffee,
   Play,
-  Sun,
-  Moon,
 } from "lucide-react"
 
 import NextLink from "next/link"
-import { useTheme } from "next-themes"
 import Image from "next/image"
-import { useEffect, useState } from "react"
 
 export default function HomePage() {
-  const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
-  const isDark = mounted ? resolvedTheme === "dark" : undefined
   return (
     <div className="min-h-screen bg-background grid-pattern">
-      <div className="fixed top-4 right-4 z-50">
-        <Button
-          variant="outline"
-          size="sm"
-          aria-label="Toggle theme"
-          className="bg-background/60 backdrop-blur border-border"
-          onClick={() => setTheme(isDark ? "light" : "dark")}
-        >
-          {mounted ? (isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />) : <div className="h-4 w-4" />}
-        </Button>
-      </div>
       <div className="container mx-auto px-4 py-24">
         <div className="text-center mb-20 animate-fade-in-up">
           <div className="flex items-center justify-center mb-8">
