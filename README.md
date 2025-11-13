@@ -3,7 +3,6 @@
 ## ⚡ Tech Stack
 <p align="center">
   <a href="https://reactjs.org/"><img src="https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black" height="28" alt="React" /></a>
-  <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white" height="28" alt="Vite" /></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" height="28" alt="TypeScript" /></a>
   <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/TailwindCSS-06B6D4?logo=tailwind-css&logoColor=white" height="28" alt="Tailwind CSS" /></a>
   <a href="https://supabase.com/"><img src="https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white" height="28" alt="Supabase" /></a>
